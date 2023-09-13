@@ -1,5 +1,5 @@
 import path from "node:path";
-import { open } from "node:fs/promises";
+import { open, writeFile } from "node:fs/promises";
 import * as readline from "node:readline/promises";
 import { from, toArray, firstValueFrom, filter } from "rxjs";
 
@@ -440,13 +440,74 @@ function simulate({
   );
 }
 
-function write() {}
+interface AdventurerResult extends Omit<ParsedAdventurer, "moves"> {
+  treasures: number;
+}
+
+interface Result {
+  adventurers: AdventurerResult[];
+  treasureCells: TreasureMap;
+}
+
+async function write(
+  path: string,
+  { height, width, mountains }: ParsedMap,
+  { adventurers, treasureCells }: Result
+) {
+  const content = [`C - ${width} - ${height}`];
+
+  const withMountains = mountains.reduce(
+    (acc, { x, y }) => [...acc, `M - ${x} - ${y}`],
+    content
+  );
+
+  const treasuresLeft = Object.entries(treasureCells).filter(
+    ([, value]) => value > 0
+  );
+
+  const treasureComment =
+    "# {T comme Trésor} - {Axe horizontal} - {Axe vertical} - {Nb. de trésors restants}";
+
+  const withTreasuresBase =
+    treasuresLeft.length > 0
+      ? [...withMountains, treasureComment]
+      : withMountains;
+
+  const withTreasures = treasuresLeft.reduce((acc, [key, value]) => {
+    const [x, y] = key.split(", ");
+
+    if (value > 0) {
+      return [...acc, `T - ${x} - ${y} - ${value}`];
+    }
+
+    return acc;
+  }, withTreasuresBase);
+
+  const adventurerComment =
+    "# {A comme Aventurier} - {Nom de l’aventurier} - {Axe horizontal} - {Axevertical} - {Orientation} - {Nb. trésors ramassés}";
+
+  const withAdventurers = adventurers.reduce(
+    (acc, { name, orientation, x, y, treasures }) => [
+      ...acc,
+      `A - ${name} - ${x} - ${y} - ${orientation} - ${treasures}`,
+    ],
+    [...withTreasures, adventurerComment]
+  );
+
+  await writeFile(path, withAdventurers.join("\n"));
+}
 
 async function main() {
   const treasmureMapPath = path.join(__dirname, "treasure-map.txt");
   const treasureMap = await read(treasmureMapPath);
   const parsedTreasmureMap = parse(treasureMap);
   const simulated = simulate(parsedTreasmureMap);
+
+  await write(
+    path.join(__dirname, "result.txt"),
+    parsedTreasmureMap,
+    simulated
+  );
 
   console.log(simulated);
 }
