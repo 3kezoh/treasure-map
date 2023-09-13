@@ -39,7 +39,7 @@ export interface Map extends Sizable {
   treasures: Treasure[];
 }
 
-interface SimulationAdventurer extends Omit<Adventurer, "moves"> {
+export interface SimulationAdventurer extends Omit<Adventurer, "moves"> {
   treasures: number;
 }
 
