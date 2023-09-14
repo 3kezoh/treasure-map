@@ -11,7 +11,7 @@ export type FileAdventurer =
 
 export type FileTreasure = `T - ${number} - ${number} - ${number}`;
 
-interface Positionable {
+export interface Positionable {
   x: number;
   y: number;
 }

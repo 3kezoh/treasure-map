@@ -4,6 +4,7 @@ import {
   Map,
   Move,
   Orientation,
+  Positionable,
   SimulationAdventurer,
   Sizable,
   TreasureMap,
@@ -63,17 +64,17 @@ export function simulate({ adventurers, treasures, mountains, ...map }: Map) {
 function simulateTurn(
   initialValue: InitialValue,
   turn: (Move | undefined)[],
-  { height, width }: Sizable
+  map: Sizable
 ) {
   return turn.reduce((acc, move, index) => {
-    const { adventurers, busyCells, treasureCells } = acc;
+    const { adventurers } = acc;
     const adventurer = adventurers.at(index);
 
     if (!adventurer || !move) {
       return acc;
     }
 
-    const { orientation, treasures, x, y } = adventurer;
+    const { orientation, x, y } = adventurer;
 
     if (move === "D") {
       return {
@@ -95,169 +96,31 @@ function simulateTurn(
       };
     }
 
+    const getNextMove = withMove(acc, map, index);
+
     switch (orientation) {
       case "N": {
         const cacheKey = `${x}, ${y - 1}` as CacheKey;
-        const isWithinBounds = y - 1 >= 0;
 
-        if (busyCells.has(cacheKey) || !isWithinBounds) {
-          return acc;
-        }
-
-        const nextBusyCells = new Set(busyCells);
-
-        nextBusyCells.delete(`${x}, ${y}`);
-        nextBusyCells.add(cacheKey);
-
-        const treasureLeft = treasureCells[cacheKey];
-
-        if (treasureLeft > 0) {
-          return {
-            ...acc,
-            adventurers: replace(adventurers, index, {
-              ...adventurer,
-              y: y - 1,
-              treasures: treasures + 1,
-            }),
-            busyCells: nextBusyCells,
-            treasureCells: {
-              ...treasureCells,
-              [cacheKey]: treasureLeft - 1,
-            },
-          };
-        }
-
-        return {
-          ...acc,
-          adventurers: replace(adventurers, index, {
-            ...adventurer,
-            y: y - 1,
-          }),
-          busyCells: nextBusyCells,
-        };
+        return getNextMove(cacheKey, { y: y - 1 });
       }
 
       case "O": {
         const cacheKey = `${x - 1}, ${y}` as CacheKey;
-        const isWithinBounds = x - 1 >= 0;
 
-        if (busyCells.has(cacheKey) || !isWithinBounds) {
-          return acc;
-        }
-
-        const nextBusyCells = new Set(busyCells);
-
-        nextBusyCells.delete(`${x}, ${y}`);
-        nextBusyCells.add(cacheKey);
-
-        const treasureLeft = treasureCells[cacheKey];
-
-        if (treasureLeft > 0) {
-          return {
-            ...acc,
-            adventurers: replace(adventurers, index, {
-              ...adventurer,
-              x: x - 1,
-              treasures: treasures + 1,
-            }),
-            busyCells: nextBusyCells,
-            treasureCells: {
-              ...treasureCells,
-              [cacheKey]: treasureLeft - 1,
-            },
-          };
-        }
-
-        return {
-          ...acc,
-          adventurers: replace(adventurers, index, {
-            ...adventurer,
-            x: x - 1,
-          }),
-          busyCells: nextBusyCells,
-        };
+        return getNextMove(cacheKey, { x: x - 1 });
       }
 
       case "S": {
         const cacheKey = `${x}, ${y + 1}` as CacheKey;
-        const isWithinBounds = y + 1 <= height;
 
-        if (busyCells.has(cacheKey) || !isWithinBounds) {
-          return acc;
-        }
-
-        const nextBusyCells = new Set(busyCells);
-
-        nextBusyCells.delete(`${x}, ${y}`);
-        nextBusyCells.add(cacheKey);
-
-        const treasureLeft = treasureCells[cacheKey];
-
-        if (treasureLeft > 0) {
-          return {
-            ...acc,
-            adventurers: replace(adventurers, index, {
-              ...adventurer,
-              y: y + 1,
-              treasures: treasures + 1,
-            }),
-            busyCells: nextBusyCells,
-            treasureCells: {
-              ...treasureCells,
-              [cacheKey]: treasureLeft - 1,
-            },
-          };
-        }
-
-        return {
-          ...acc,
-          adventurers: replace(adventurers, index, {
-            ...adventurer,
-            y: y + 1,
-          }),
-          busyCells: nextBusyCells,
-        };
+        return getNextMove(cacheKey, { y: y + 1 });
       }
 
       case "E": {
         const cacheKey = `${x + 1}, ${y}` as CacheKey;
-        const isWithinBounds = x + 1 <= width;
 
-        if (busyCells.has(cacheKey) || !isWithinBounds) {
-          return acc;
-        }
-
-        const nextBusyCells = new Set(busyCells);
-
-        nextBusyCells.delete(`${x}, ${y}`);
-        nextBusyCells.add(cacheKey);
-
-        const treasureLeft = treasureCells[cacheKey];
-
-        if (treasureLeft > 0) {
-          return {
-            ...acc,
-            adventurers: replace(adventurers, index, {
-              ...adventurer,
-              x: x + 1,
-              treasures: treasures + 1,
-            }),
-            busyCells: nextBusyCells,
-            treasureCells: {
-              ...treasureCells,
-              [cacheKey]: treasureLeft - 1,
-            },
-          };
-        }
-
-        return {
-          ...acc,
-          adventurers: replace(adventurers, index, {
-            ...adventurer,
-            x: x + 1,
-          }),
-          busyCells: nextBusyCells,
-        };
+        return getNextMove(cacheKey, { x: x + 1 });
       }
     }
   }, initialValue);
@@ -280,4 +143,64 @@ function replace<T>(arr: T[], index: number, element: unknown) {
   return Object.assign([], arr, {
     [index]: element,
   });
+}
+
+function isWithinBounds(
+  { x, y }: SimulationAdventurer,
+  { width, height }: Sizable
+) {
+  const isXWithinBounds = x >= 0 && x <= width;
+  const isYWithinBounds = y >= 0 && y <= height;
+
+  return isXWithinBounds && isYWithinBounds;
+}
+
+function withMove(acc: InitialValue, map: Sizable, index: number) {
+  const { adventurers, treasureCells, busyCells } = acc;
+
+  const adventurer = adventurers.at(index);
+
+  if (!adventurer) {
+    return () => acc;
+  }
+
+  const { treasures, x, y } = adventurer;
+
+  return (cacheKey: CacheKey, positions: Partial<Positionable>) => {
+    if (busyCells.has(cacheKey) || !isWithinBounds(adventurer, map)) {
+      return acc;
+    }
+
+    const nextBusyCells = new Set(busyCells);
+
+    nextBusyCells.delete(`${x}, ${y}`);
+    nextBusyCells.add(cacheKey);
+
+    const treasureLeft = treasureCells[cacheKey];
+
+    if (treasureLeft > 0) {
+      return {
+        ...acc,
+        adventurers: replace(adventurers, index, {
+          ...adventurer,
+          treasures: treasures + 1,
+          ...positions,
+        }),
+        busyCells: nextBusyCells,
+        treasureCells: {
+          ...treasureCells,
+          [cacheKey]: treasureLeft - 1,
+        },
+      };
+    }
+
+    return {
+      ...acc,
+      adventurers: replace(adventurers, index, {
+        ...adventurer,
+        ...positions,
+      }),
+      busyCells: nextBusyCells,
+    };
+  };
 }
