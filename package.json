@@ -2,7 +2,7 @@
   "name": "treasure-map",
   "version": "1.0.0",
   "description": "Practical exercise",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest run --coverage"

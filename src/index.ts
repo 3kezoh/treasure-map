@@ -1,9 +1,9 @@
-import { read } from "./src/read";
-import { write } from "./src/write";
-import { simulate } from "./src/simulate";
-import { parse } from "./src/parse";
-import { validate } from "./src/validate";
-import { ValidationError, isValidationError } from "./src/ValidationError";
+import { read } from "./read";
+import { write } from "./write";
+import { simulate } from "./simulate";
+import { parse } from "./parse";
+import { validate } from "./validate";
+import { ValidationError, isValidationError } from "./ValidationError";
 
 async function main() {
   try {
