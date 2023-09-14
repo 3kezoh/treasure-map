@@ -63,7 +63,7 @@ export function parse(strings: string[]) {
 }
 
 function isMap(str: string): str is FileMap {
-  return /^C - \d - \d$/.test(str);
+  return /^C - [1-9]\d* - [1-9]\d*$/.test(str);
 }
 
 function parseMap(map: FileMap): Sizable {
@@ -76,7 +76,7 @@ function parseMap(map: FileMap): Sizable {
 }
 
 function isMoutain(str: string): str is FileMountain {
-  return /^M - \d - \d$/.test(str);
+  return /^M - \d+ - \d+$/.test(str);
 }
 
 function parseMoutain(mountain: FileMountain): { x: number; y: number } {
@@ -89,7 +89,7 @@ function parseMoutain(mountain: FileMountain): { x: number; y: number } {
 }
 
 function isTreasure(str: string): str is FileTreasure {
-  return /^T - \d - \d - \d$/.test(str);
+  return /^T - \d+ - \d+ - [1-9]\d*$/.test(str);
 }
 
 function parseTreasure(treasure: FileTreasure): Treasure {
@@ -103,7 +103,7 @@ function parseTreasure(treasure: FileTreasure): Treasure {
 }
 
 function isAdventurer(str: string): str is FileAdventurer {
-  return /^A - .+ - \d - \d - (N|O|S|E) - (A|D|G)+$/.test(str);
+  return /^A - .+ - \d+ - \d+ - (N|O|S|E) - (A|D|G)+$/.test(str);
 }
 
 function parseAdventurer(adventurer: FileAdventurer): Adventurer {
