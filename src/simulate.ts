@@ -145,14 +145,14 @@ function replace<T>(arr: T[], index: number, element: unknown) {
   });
 }
 
-function isWithinBounds(
+function isOutOfBounds(
   { x, y }: SimulationAdventurer,
   { width, height }: Sizable
 ) {
-  const isXWithinBounds = x >= 0 && x <= width;
-  const isYWithinBounds = y >= 0 && y <= height;
+  const isXOutOfBounds = x < 0 || x > width;
+  const isYOutOfBounds = y < 0 || y > height;
 
-  return isXWithinBounds && isYWithinBounds;
+  return isXOutOfBounds || isYOutOfBounds;
 }
 
 function withMove(acc: InitialValue, map: Sizable, index: number) {
@@ -167,7 +167,10 @@ function withMove(acc: InitialValue, map: Sizable, index: number) {
   const { treasures, x, y } = adventurer;
 
   return (cacheKey: CacheKey, positions: Partial<Positionable>) => {
-    if (busyCells.has(cacheKey) || !isWithinBounds(adventurer, map)) {
+    if (
+      busyCells.has(cacheKey) ||
+      isOutOfBounds({ ...adventurer, ...positions }, map)
+    ) {
       return acc;
     }
 
