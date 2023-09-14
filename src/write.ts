@@ -1,9 +1,9 @@
-import { writeFile } from "node:fs/promises";
+import fs from "node:fs/promises";
 import { Map, SimulationResult } from "./types";
 
 export async function write(
   path: string,
-  { height, width, mountains }: Map,
+  { height, width, mountains }: Pick<Map, "height" | "width" | "mountains">,
   { adventurers, treasureCells }: SimulationResult
 ) {
   const content = [`C - ${width} - ${height}`];
@@ -20,19 +20,16 @@ export async function write(
   const treasureComment =
     "# {T comme Trésor} - {Axe horizontal} - {Axe vertical} - {Nb. de trésors restants}";
 
-  const withTreasuresBase =
-    treasuresLeft.length > 0
-      ? [...withMountains, treasureComment]
-      : withMountains;
+  const isTreasureLeft = treasuresLeft.length > 0;
+
+  const withTreasuresBase = isTreasureLeft
+    ? [...withMountains, treasureComment]
+    : withMountains;
 
   const withTreasures = treasuresLeft.reduce((acc, [key, value]) => {
     const [x, y] = key.split(", ");
 
-    if (value > 0) {
-      return [...acc, `T - ${x} - ${y} - ${value}`];
-    }
-
-    return acc;
+    return [...acc, `T - ${x} - ${y} - ${value}`];
   }, withTreasuresBase);
 
   const adventurerComment =
@@ -46,5 +43,5 @@ export async function write(
     [...withTreasures, adventurerComment]
   );
 
-  await writeFile(path, withAdventurers.join("\n"));
+  return fs.writeFile(path, withAdventurers.join("\n"));
 }
