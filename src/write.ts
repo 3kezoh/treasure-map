@@ -1,6 +1,14 @@
 import fs from "node:fs/promises";
 import { Map, SimulationResult } from "./types";
 
+/**
+ * Writes the simulation result to a file with a specified format.
+ *
+ * @param path - The path to the file where the simulation result will be written.
+ * @param map - The map configuration, including height, width, and mountains.
+ * @param simulationResult - The simulation result, including adventurers and treasureCells.
+ * @returns A Promise that resolves when the file is successfully written.
+ */
 export async function write(
   path: string,
   { height, width, mountains }: Pick<Map, "height" | "width" | "mountains">,
