@@ -41,11 +41,11 @@ In the root of the project, using the existing treasure-map.txt file.
 
 ```
 # Using ts-node
-pnpx ts-node src ./treasure-map.txt result.txt
+pnpx ts-node src ./data/treasure-map.txt ./data/result.txt
 
 # Using node
 pnpm build
-node dist ./treasure-map.txt result.txt
+node dist ./data/treasure-map.txt ./data/result.txt
 
 # Using docker
 docker run --rm -v $(pwd)/data:/home/node/treasure-map/data ekezoh/treasure-map ./data/treasure-map.txt ./data/result.txt
