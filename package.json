@@ -4,6 +4,7 @@
   "description": "Practical exercise",
   "main": "src/index.ts",
   "scripts": {
+    "build": "tsc",
     "test": "vitest",
     "test:coverage": "vitest run --coverage"
   },
