@@ -11,8 +11,6 @@ async function main() {
   const simulated = simulate(parsedTreasureMap);
 
   await write(path.join(__dirname, "result.txt"), parsedTreasureMap, simulated);
-
-  console.log(simulated);
 }
 
 main();
