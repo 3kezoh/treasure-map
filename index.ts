@@ -1,4 +1,3 @@
-import path from "node:path";
 import { read } from "./src/read";
 import { write } from "./src/write";
 import { simulate } from "./src/simulate";
@@ -8,8 +7,13 @@ import { ValidationError, isValidationError } from "./src/ValidationError";
 
 async function main() {
   try {
-    const treasmureMapPath = path.join(__dirname, "treasure-map.txt");
-    const treasureMap = await read(treasmureMapPath);
+    const [, , inputPath, outputPath] = process.argv;
+
+    if (!inputPath || !outputPath) {
+      throw new Error("Usage: node index.ts <input> <output>");
+    }
+
+    const treasureMap = await read(inputPath);
     const parsedTreasureMap = parse(treasureMap);
     const errors = validate(parsedTreasureMap);
 
@@ -18,9 +22,8 @@ async function main() {
     }
 
     const simulated = simulate(parsedTreasureMap);
-    const writePath = path.join(__dirname, "result.txt");
 
-    await write(writePath, parsedTreasureMap, simulated);
+    await write(outputPath, parsedTreasureMap, simulated);
   } catch (error: unknown) {
     if (isValidationError(error)) {
       return console.error(error.message, error.errors);
