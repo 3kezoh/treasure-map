@@ -9,6 +9,7 @@ import {
   Sizable,
   TreasureMap,
 } from "./types";
+import { isOutOfBounds } from "./utils";
 
 interface InitialValue {
   adventurers: SimulationAdventurer[];
@@ -143,16 +144,6 @@ function replace<T>(arr: T[], index: number, element: unknown) {
   return Object.assign([], arr, {
     [index]: element,
   });
-}
-
-function isOutOfBounds(
-  { x, y }: SimulationAdventurer,
-  { width, height }: Sizable
-) {
-  const isXOutOfBounds = x < 0 || x > width;
-  const isYOutOfBounds = y < 0 || y > height;
-
-  return isXOutOfBounds || isYOutOfBounds;
 }
 
 function withMove(acc: InitialValue, map: Sizable, index: number) {
