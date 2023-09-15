@@ -45,8 +45,21 @@ pnpx ts-node src ./data/treasure-map.txt ./data/result.txt
 
 # Using node
 pnpm build
-node dist ./data/treasure-map.txt ./data/result.txt
+node dist/src ./data/treasure-map.txt ./data/result.txt
 
-# Using docker
+#  Without pulling, using docker
+mkdir -p ./data
+
+echo "# Treasure map
+C - 3 - 4
+M - 1 - 0
+M - 2 - 1
+T - 0 - 3 - 2
+T - 1 - 3 - 3
+A - Lara - 1 - 1 - S - AADADAGGA" > ./data/treasure-map.txt
+
 docker run --rm -v $(pwd)/data:/home/node/treasure-map/data ekezoh/treasure-map ./data/treasure-map.txt ./data/result.txt
+
+cat ./data/result.txt
+
 ```
