@@ -5,6 +5,12 @@ import { parse } from "./parse";
 import { validate } from "./validate";
 import { ValidationError, isValidationError } from "./ValidationError";
 
+/**
+ * The main function responsible for orchestrating the simulation process.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 async function main() {
   try {
     const [, , inputPath, outputPath] = process.argv;
@@ -21,9 +27,9 @@ async function main() {
       throw new ValidationError(errors);
     }
 
-    const simulated = simulate(parsedTreasureMap);
+    const simulationResult = simulate(parsedTreasureMap);
 
-    await write(outputPath, parsedTreasureMap, simulated);
+    await write(outputPath, parsedTreasureMap, simulationResult);
   } catch (error: unknown) {
     if (isValidationError(error)) {
       return console.error(error.message, error.errors);
